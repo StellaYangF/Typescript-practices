@@ -73,13 +73,13 @@ namespace three {
 namespace four {
     type sumFunc = (a: number, b: number) => number;
     let sum: sumFunc;
-    function f1(a: number, b: number):number {
+    function f1(a: number, b: number): number {
         return a + b;
     }
     sum = f1;
 
     // 可省略一个参数
-    function f2(a:number): number {
+    function f2(a: number): number {
         return a;
     }
     sum = f2;
@@ -94,7 +94,107 @@ namespace four {
     function f4(a: number, b: number, c: number): number {
         return a + b + c;
     }
-    sum = f4;
+    // sum = f4;
     // Type '(a: number, b: number, c: number) => number' 
     // is not assignable to type 'sumFunc'.
+}
+
+/**
+ * 比较返回值
+ */
+namespace five {
+    type GetPerson = () => { name: string, age: number };
+
+    let getPerson: GetPerson;
+
+    function g1() {
+        return { name: 'Stella', age: 18 };
+    }
+    getPerson = g1;
+
+    function g2() {
+        return {
+            name: 'Stella',
+            age: 18,
+            gender: 'female',
+        }
+    }
+    getPerson = g2;
+
+    function g3() {
+        return {
+            name: 'Stella',
+        }
+    }
+    // getPerson = g3;
+    // Property 'age' is missing in type '{ name: string; }' but required in type '{ name: string; age: number; }'.
+
+}
+
+/**
+ * 函数参数的协变
+ */
+namespace six {
+    let sourceFn = (args: number | string) => { }
+    let targetFn1 = (args: number | string) => { }
+    let targetFn2 = (args: number | string | boolean) => { }
+    sourceFn = targetFn1;
+    sourceFn = targetFn2;
+
+    interface Event {
+        timestamp: number
+    }
+    interface MouseEvent extends Event {
+        eventX: number
+        eventY: number
+    }
+    interface EventType extends Event {
+        keyCode: number
+    }
+}
+
+/**
+ * 泛型的兼容
+ *  - 接口内容为空没用到泛型的时候是可以的
+ */
+
+namespace seven {
+    interface Empty<T> { }
+    //  1.接口内容为空没用到泛型的时候是可以的
+    let x: Empty<string>;
+    let y: Empty<number>;
+    x = y;
+
+    // 2.接口内容不为空的时候不可以
+    interface NotEmpty<T> {
+        data: T;
+    }
+    let x1: NotEmpty<string>;
+    let y1: NotEmpty<number>;
+    // x1 = y1;
+    // Type 'number' is not assignable to type 'string'.
+
+}
+
+/**
+ * 枚举的兼容性
+ *  - 枚举类型与数字类型兼容，并且数字类型与枚举类型兼容
+ *  - 不同枚举类型之间是不兼容的
+ */
+namespace eight {
+    enum Colors {
+        Red,
+        Yellow,
+    }
+    let c: Colors;
+    c = Colors.Red;
+    console.log(c);
+    c = 1;
+    console.log(c);
+    // c = '1';
+    // Type '"1"' is not assignable to type 'Colors'.
+
+    let n: number;
+    n = 1;
+    n = Colors.Red;
 }
